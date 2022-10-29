@@ -73,6 +73,24 @@ function App() {
     }
   }, [reset])
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.code.match(/Digit[0-9]/) &&
+        activeCell?.id &&
+        !activeCell?.config
+      ) {
+        const value = parseInt(event.key)
+        const nextBoard = board.slice()
+        nextBoard[activeCell.id.row][activeCell.id.column].value = value
+        setBoard(nextBoard)
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [board, activeCell])
+
   return (
     <div
       style={{

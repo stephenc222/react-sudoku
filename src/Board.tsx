@@ -17,8 +17,9 @@ const Cell = ({ value, onClick, active, sameRow, sameColumn }: any) => (
   <button
     onClick={onClick}
     style={{
-      width: 50,
-      height: 50,
+      width: 60,
+      height: 60,
+      fontSize: 18,
       padding: "0.5em",
       border: "1px solid black",
       backgroundColor: active
