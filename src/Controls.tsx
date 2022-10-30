@@ -1,13 +1,11 @@
 import React from "react"
 
-const Controls = ({ onClick, onRestart }: any) => {
+const Controls = ({ onClick }: any) => {
   return (
     <div>
       <div
         style={{ display: "flex", justifyContent: "center", padding: "1em" }}
-      >
-        <button onClick={onRestart}>New Game</button>
-      </div>
+      ></div>
       <div>
         <div>
           <button

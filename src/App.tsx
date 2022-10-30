@@ -190,7 +190,6 @@ function App() {
       <main style={{ display: "flex", alignItems: "center" }}>
         <div style={{ textAlign: "center" }}>
           <h1 style={{ width: "100%", textAlign: "center" }}>React Sudoku</h1>
-          {numBlanks > 0 ? `Blanks remaining: ${numBlanks}` : "You won!"}
           {numBlanks > 0 && (
             <Board
               activeCell={activeCell as CellData}
@@ -199,8 +198,19 @@ function App() {
             />
           )}
         </div>
-        <div style={{ padding: "2em" }}>
-          <Controls onClick={onNumberClick} onRestart={onRestart} />
+        <div
+          style={{
+            padding: "2em",
+            display: "flex",
+            flexDirection: "column",
+            textAlign: "center",
+          }}
+        >
+          {numBlanks > 0 ? `Blanks remaining: ${numBlanks}` : "You won!"}
+          <button onClick={onRestart}>New Game</button>
+          {numBlanks !== 0 && (
+            <Controls onClick={onNumberClick} onRestart={onRestart} />
+          )}
         </div>
       </main>
     </div>
