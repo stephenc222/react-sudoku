@@ -52,7 +52,7 @@ const found = (board: Row[], num: number, row: number, column: number) => {
 const getRandomBoard = (emptyCells = EMPTY_CELLS) => {
   const board: Row[] = [[]]
   const sudoku = new Sudoku(TOTAL_CELLS - emptyCells)
-  const rawBoard: Row[] = sudoku.generate().getBoard()
+  const rawBoard: number[][] = sudoku.generate().getBoard()
 
   for (let i = 0; i < ROWS; ++i) {
     if (!board[i]) {
@@ -67,7 +67,7 @@ const getRandomBoard = (emptyCells = EMPTY_CELLS) => {
       }
     }
   }
-  return { board, numBlanks: EMPTY_CELLS }
+  return { board, numBlanks: emptyCells }
 }
 
 function App() {

@@ -1,7 +1,24 @@
 // based on:
 // https://gist.github.com/scriptype/80ff816c6ebd9faefbb3
 export class Sudoku {
-  constructor(hints, limit) {
+  hints?: number
+  limit?: number
+  _logs: {
+    raw: string[]
+    incidents: {
+      limitExceeded: number
+      notValid: number
+      noNumbers: number
+    }
+  }
+  success: boolean
+  numbers: () => number[]
+  randomRow: () => number[]
+  result: null[]
+  map: number[][]
+  stack: number[]
+
+  constructor(hints?: number, limit?: number) {
     this.hints = hints
     this.limit = limit || 10000
 
@@ -14,7 +31,7 @@ export class Sudoku {
       },
     }
 
-    this.success = null
+    this.success = false
 
     this.numbers = () =>
       new Array(9)
@@ -68,14 +85,14 @@ export class Sudoku {
     return this
   }
 
-  toRows(arr) {
+  toRows(arr: number[]) {
     let row = 0
-    let asRows = new Array(9)
+    let asRows: number[][] = new Array(9)
       .join(" ")
       .split(" ")
       .map((row) => [])
 
-    for (let [index, entry] of arr.entries()) {
+    for (let [index, entry] of arr.entries() as unknown as number[][]) {
       asRows[row].push(entry)
 
       if (!((index + 1) % 9)) {
@@ -86,12 +103,12 @@ export class Sudoku {
     return asRows
   }
 
-  no(path, index, msg) {
+  no(path: string, index: number, msg: string) {
     let number = path[path.length - 1]
     this._logs.raw.push(`no: @${index} [${number}] ${msg} ${path} `)
   }
 
-  yes(path, index) {
+  yes(path: string, index: number) {
     this._logs.raw.push(`yes: ${index} ${path}`)
   }
 
@@ -107,36 +124,42 @@ export class Sudoku {
   }
 
   getBoard() {
-    return this.toRows(this.substractCells())
+    return this.toRows(this.substractCells() as unknown as number[])
   }
 
   getSolution() {
-    return this.toRows(this.result)
+    return this.toRows(this.result as unknown as number[])
   }
 
   substractCells() {
-    let _getNonEmptyIndex = () => {
+    let _getNonEmptyIndex: () => number | null = () => {
       let index = Math.floor(Math.random() * _result.length)
       return _result[index] ? index : _getNonEmptyIndex()
     }
 
     let _result = this.result.filter(() => true)
 
-    while (_result.length - this.hints > _result.filter((n) => !n).length) {
+    while (
+      _result.length - (this.hints as number) >
+      _result.filter((n) => !n).length
+    ) {
       const nonEmptyIndex = _getNonEmptyIndex()
       // console.log("cheat cell value:", {
       //   index: nonEmptyIndex,
+      //   // @ts-ignore
       //   row: Math.floor(nonEmptyIndex / 9),
+      //   // @ts-ignore
       //   column: nonEmptyIndex % 9,
+      //   // @ts-ignore
       //   value: _result[nonEmptyIndex],
       // })
-      _result[nonEmptyIndex] = ""
+      _result[nonEmptyIndex as number] = "" as unknown as null
     }
 
     return _result
   }
 
-  validate(map, number, index) {
+  validate(map: number[], number: number, index: number) {
     let rowIndex = Math.floor(index / 9)
     let colIndex = index % 9
 
@@ -169,7 +192,7 @@ export class Sudoku {
     }
   }
 
-  _validate(map, index) {
+  _validate(map: number[][], index: number) {
     if (!map[index].length) {
       return false
     }
@@ -177,7 +200,7 @@ export class Sudoku {
     this.stack.splice(index, this.stack.length)
 
     let path = map[index]
-    let number = path[path.length - 1]
+    let number = path[path.length - 1] as unknown as number
 
     let didFoundNumber = this.validate(this.stack, number, index)
 
@@ -188,14 +211,14 @@ export class Sudoku {
     )
   }
 
-  _generate(map, index) {
+  _generate(map: number[][], index: number) {
     if (index === 9 * 9) {
       return true
     }
 
-    if (--this.limit < 0) {
+    if (--(this.limit as number) < 0) {
       this._logs.incidents.limitExceeded++
-      this.no(map[index], index, "limit exceeded")
+      this.no(map[index] as unknown as string, index, "limit exceeded")
       return false
     }
 
@@ -205,7 +228,7 @@ export class Sudoku {
       map[index] = this.numbers()
       map[index - 1].pop()
       this._logs.incidents.noNumbers++
-      this.no(path, index, "no numbers in it")
+      this.no(path as unknown as string, index, "no numbers in it")
       return false
     }
 
@@ -216,16 +239,17 @@ export class Sudoku {
       map[index].pop()
       map[index + 1] = this.numbers()
       this._logs.incidents.notValid++
-      this.no(path, index, "is not valid")
+      this.no(path as unknown as string, index, "is not valid")
       return false
     } else {
       this.stack.push(currentNumber)
     }
 
-    for (let number of path.entries()) {
+    for (let number of path.entries() as unknown as number[][]) {
       if (this._generate(map, index + 1)) {
-        this.result[index] = currentNumber
-        this.yes(path, index)
+        this.result[index as unknown as number] =
+          currentNumber as unknown as null
+        this.yes(path as unknown as string, index)
         return true
       }
     }
