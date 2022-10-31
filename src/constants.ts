@@ -1,5 +1,7 @@
 export const ROWS = 9
 export const COLUMNS = 9
+export const EMPTY_CELLS = 10
+export const TOTAL_CELLS = 81
 
 export const SQUARES_ARRAY = [
   // top left square

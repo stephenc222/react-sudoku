@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react"
 import Board, { Row, CellData } from "./Board"
 import Controls from "./Controls"
-import { ROWS, COLUMNS, SQUARES_ARRAY } from "./constants"
+import {
+  ROWS,
+  COLUMNS,
+  SQUARES_ARRAY,
+  EMPTY_CELLS,
+  TOTAL_CELLS,
+} from "./constants"
+import { Sudoku } from "./sudoku"
 
 // copying:
 // https://sudoku.com/
@@ -42,41 +49,25 @@ const found = (board: Row[], num: number, row: number, column: number) => {
   return false
 }
 
-const testBoard = [
-  [4, 3, 5, 2, 6, 9, 7, 8, undefined], // answer 1
-  [6, 8, 2, undefined, 7, 1, 4, 9, 3], // answer 5
-  [1, 9, 7, 8, 3, 4, 5, 6, 2],
-  [8, 2, 6, 1, 9, 5, 3, 4, 7],
-  [3, 7, 4, 6, 8, 2, 9, 1, 5],
-  [9, 5, 1, 7, 4, 3, 6, 2, 8],
-  [5, 1, 9, 3, 2, 6, 8, 7, 4],
-  [2, 4, 8, 9, 5, 7, 1, 3, 6],
-  [7, 6, 3, 4, 1, 8, 2, 5, 9],
-]
-
-const getRandomBoard = () => {
+const getRandomBoard = (emptyCells = EMPTY_CELLS) => {
   const board: Row[] = [[]]
-  let numBlanks = 0
+  const sudoku = new Sudoku(TOTAL_CELLS - emptyCells)
+  const rawBoard: Row[] = sudoku.generate().getBoard()
+
   for (let i = 0; i < ROWS; ++i) {
     if (!board[i]) {
       board[i] = []
     }
     for (let j = 0; j < COLUMNS; ++j) {
-      // FIXME: fix game number generation logic
-      // const randNum = Math.floor(Math.random() * 9) + 1
-      // const value = !found(board, randNum, i, j) ? randNum : undefined
-      const value = testBoard[i][j]
-      if (value === undefined) {
-        numBlanks += 1
-      }
+      const value = rawBoard[i][j] as unknown as number | string
       board[i][j] = {
-        value,
+        value: (value === "" ? undefined : value) as number,
         id: { row: i, column: j },
-        config: value !== undefined,
+        config: value !== "",
       }
     }
   }
-  return { board, numBlanks }
+  return { board, numBlanks: EMPTY_CELLS }
 }
 
 function App() {
